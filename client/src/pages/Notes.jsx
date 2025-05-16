@@ -10,6 +10,9 @@ import {
   message,
   Typography,
   Divider,
+  Breadcrumb,
+  Spin,
+  Empty,
 } from 'antd';
 import {
   UploadOutlined,
@@ -18,10 +21,12 @@ import {
   EyeOutlined,
   StarOutlined,
   StarFilled,
+  HomeOutlined,
+  FileTextOutlined,
 } from '@ant-design/icons';
 import { getNotes, deleteNote, toggleNoteFavorite } from '@/api/noteApi';
 import { useStore } from '@/store/userStore';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
 import { importNotes } from '@/api/noteApi'; // 假设已正确导入
 
@@ -34,6 +39,7 @@ const Notes = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedNoteId, setSelectedNoteId] = useState(null);
   const [importModalVisible, setImportModalVisible] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) navigate('/login');
@@ -41,11 +47,14 @@ const Notes = () => {
 
   const fetchNotes = async () => {
     try {
+      setLoading(true);
       const fetchNotesData = await getNotes(user.id);
       setNotes(fetchNotesData.data);
     } catch (error) {
       console.error('Failed to fetch notes:', error);
-      alert('获取笔记失败');
+      message.error('获取笔记失败');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -135,10 +144,33 @@ const Notes = () => {
     }
   };
 
+  const handleDeleteNote = async () => {
+    try {
+      await deleteNote(selectedNoteId);
+      setNotes(notes.filter((note) => note.id !== selectedNoteId));
+      setModalVisible(false);
+      message.success('笔记已删除');
+    } catch (error) {
+      console.error('Failed to delete note:', error);
+      message.error('删除笔记失败');
+    }
+  };
+
   return (
     <>
       <Navbar />
       <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto w-full bg-gray-50 min-h-screen">
+        <Breadcrumb className="mb-4">
+          <Breadcrumb.Item>
+            <Link to="/">
+              <HomeOutlined /> 首页
+            </Link>
+          </Breadcrumb.Item>
+          <Breadcrumb.Item>
+            <FileTextOutlined /> 笔记
+          </Breadcrumb.Item>
+        </Breadcrumb>
+
         <div className="flex justify-between items-center mb-6">
           <Title level={2} className="m-0">
             我的笔记
@@ -165,108 +197,100 @@ const Notes = () => {
         <Divider className="my-4" />
 
         {/* 笔记列表 */}
-        <List
-          grid={{
-            gutter: 16,
-            xs: 1,
-            sm: 2,
-            md: 3,
-            lg: 4,
-            xl: 4,
-            xxl: 4,
-          }}
-          dataSource={notes}
-          className="p-4"
-          renderItem={(item) => (
-            <List.Item>
-              <Card
-                className="h-full transition-all duration-300 hover:shadow-lg border border-gray-200"
-                hoverable
-                actions={[
-                  <EyeOutlined
-                    key="view"
-                    onClick={() => navigate(`/notes/${item.id}`)}
-                  />,
-                  <EditOutlined
-                    key="edit"
-                    onClick={() => navigate(`/notes/edit/${item.id}`)}
-                  />,
-                  <DeleteOutlined
-                    key="delete"
-                    className="text-red-500"
-                    onClick={() => {
-                      setModalVisible(true);
-                      setSelectedNoteId(item.id);
-                    }}
-                  />,
-                  item.is_favorite ? (
-                    <StarFilled
-                      key="favorite"
-                      className="text-yellow-500"
-                      onClick={() => handleToggleFavorite(item.id, true)}
-                    />
-                  ) : (
-                    <StarOutlined
-                      key="favorite"
-                      onClick={() => handleToggleFavorite(item.id, false)}
-                    />
-                  ),
-                ]}
-                cover={
-                  <div className="h-32 bg-gradient-to-r from-blue-100 to-blue-200 flex items-center justify-center p-4">
-                    <Title
-                      level={4}
-                      className="text-center text-blue-800 m-0 line-clamp-2"
-                    >
-                      {item.title}
-                    </Title>
-                  </div>
-                }
-              >
-                <Card.Meta
-                  description={
-                    <Paragraph ellipsis={{ rows: 3 }} className="text-gray-600">
-                      {item.content}
-                    </Paragraph>
-                  }
-                />
-                <div className="mt-4 flex flex-wrap gap-1">
-                  {item.tags &&
-                    item.tags.map((tag) => (
-                      <Tag color="blue" key={tag} className="m-0 mb-1">
-                        {tag}
-                      </Tag>
-                    ))}
-                </div>
-              </Card>
-            </List.Item>
-          )}
-        />
+        {loading ? (
+          <div className="flex justify-center items-center h-64">
+            <Spin size="large" />
+          </div>
+        ) : notes.length === 0 ? (
+          <Empty description="暂无笔记" />
+        ) : (
+          <List
+            grid={{
+              gutter: 16,
+              xs: 1,
+              sm: 2,
+              md: 3,
+              lg: 3,
+              xl: 4,
+              xxl: 4,
+            }}
+            dataSource={notes}
+            renderItem={(item) => (
+              <List.Item>
+                <Card
+                  hoverable
+                  className="h-full transition-all duration-300 hover:shadow-lg border border-gray-200"
+                  actions={[
+                    <EyeOutlined
+                      key="view"
+                      onClick={() => navigate(`/notes/${item.id}`)}
+                    />,
+                    <EditOutlined
+                      key="edit"
+                      onClick={() => navigate(`/notes/edit/${item.id}`)}
+                    />,
+                    <DeleteOutlined
+                      key="delete"
+                      className="text-red-500"
+                      onClick={() => {
+                        setModalVisible(true);
+                        setSelectedNoteId(item.id);
+                      }}
+                    />,
+                    item.is_favorite ? (
+                      <StarFilled
+                        key="favorite"
+                        className="text-yellow-500"
+                        onClick={() => handleToggleFavorite(item.id, true)}
+                      />
+                    ) : (
+                      <StarOutlined
+                        key="favorite"
+                        onClick={() => handleToggleFavorite(item.id, false)}
+                      />
+                    ),
+                  ]}
+                >
+                  <Card.Meta
+                    title={
+                      <Title level={4} className="m-0">
+                        {item.title}
+                      </Title>
+                    }
+                    description={
+                      <Paragraph
+                        ellipsis={{ rows: 3 }}
+                        className="text-gray-600 mt-2"
+                      >
+                        {item.content}
+                      </Paragraph>
+                    }
+                  />
+                  {item.tags && item.tags.length > 0 && (
+                    <div className="mt-4 flex flex-wrap gap-1">
+                      {item.tags.map((tag) => (
+                        <Tag color="blue" key={tag} className="m-0 mb-1">
+                          {tag}
+                        </Tag>
+                      ))}
+                    </div>
+                  )}
+                </Card>
+              </List.Item>
+            )}
+          />
+        )}
 
         {/* 删除确认对话框 */}
         <Modal
           title="确认删除"
           open={modalVisible}
-          onOk={async () => {
-            try {
-              await deleteNote(selectedNoteId);
-              message.success('笔记删除成功');
-              fetchNotes();
-            } catch (error) {
-              console.error('Failed to delete note:', error);
-              message.error('删除笔记失败');
-            } finally {
-              setModalVisible(false);
-              setSelectedNoteId(null);
-            }
-          }}
-          onCancel={() => {
-            setModalVisible(false);
-            setSelectedNoteId(null);
-          }}
-          okButtonProps={{ danger: true, className: 'bg-red-500' }}
+          onOk={handleDeleteNote}
+          onCancel={() => setModalVisible(false)}
+          okText="确认"
+          cancelText="取消"
         >
-          <p>确定要删除这条笔记吗？此操作不可恢复。</p>
+          <p>确定要删除这个笔记吗？此操作不可恢复。</p>
         </Modal>
 
         {/* 导入笔记对话框 */}
@@ -276,21 +300,20 @@ const Notes = () => {
           onCancel={() => setImportModalVisible(false)}
           footer={null}
         >
-          <p className="mb-4">
-            请选择JSON格式的笔记文件进行导入。文件格式应为笔记数组。
-          </p>
-          <Upload
+          <Upload.Dragger
+            name="file"
             accept=".json"
             beforeUpload={handleImportNotes}
             showUploadList={false}
           >
-            <Button
-              icon={<UploadOutlined />}
-              className="bg-blue-50 text-blue-500 border-blue-200 hover:bg-blue-100"
-            >
-              选择文件
-            </Button>
-          </Upload>
+            <p className="ant-upload-drag-icon">
+              <UploadOutlined />
+            </p>
+            <p className="ant-upload-text">点击或拖拽文件到此区域上传</p>
+            <p className="ant-upload-hint">
+              支持单个或批量上传，仅支持 .json 格式文件
+            </p>
+          </Upload.Dragger>
         </Modal>
       </div>
     </>
