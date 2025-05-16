@@ -69,6 +69,7 @@ const Navbar = () => {
                   key: 'profile',
                   icon: <UserOutlined />,
                   label: '个人信息',
+                  onClick: () => window.location.href = '/profile',
                 },
                 {
                   key: 'logout',
