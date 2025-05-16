@@ -1,22 +1,26 @@
-import { Layout, Menu, Button, Avatar, Dropdown } from 'antd';
+import { Layout, Menu, Button, Avatar, Dropdown, Switch } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 import { useStore } from '@/store/userStore';
+import { useThemeStore } from '@/store/themeStore';
 import {
   HomeOutlined,
   FolderOutlined,
   FileTextOutlined,
   UserOutlined,
   LogoutOutlined,
+  BulbOutlined,
+  BulbFilled,
 } from '@ant-design/icons';
 
 const { Header } = Layout;
 
 const Navbar = () => {
   const { user, logout } = useStore();
+  const { theme, toggleTheme } = useThemeStore();
   const location = useLocation();
 
   return (
-    <Header className="bg-white shadow-md px-4 flex items-center justify-between w-full z-50">
+    <Header className="bg-white shadow-md px-4 flex items-center justify-between w-full z-50" style={{ backgroundColor: theme === 'dark' ? '#141414' : '#ffffff' }}>
       <div className="flex items-center">
         <Link to="/" className="text-xl font-bold text-blue-600 mr-8">
           笔记应用
@@ -61,6 +65,16 @@ const Navbar = () => {
       </div>
 
       <div className="flex items-center">
+        {/* 主题切换开关 */}
+        <div className="mr-4 flex items-center">
+          <Switch
+            checkedChildren={<BulbFilled />}
+            unCheckedChildren={<BulbOutlined />}
+            checked={theme === 'dark'}
+            onChange={toggleTheme}
+          />
+        </div>
+
         {user ? (
           <Dropdown
             menu={{
