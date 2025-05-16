@@ -130,16 +130,16 @@ export const toggleFavorite = async (req, res) => {
   try {
     const { id } = req.params;
     const { isFavorite } = req.body;
-    
-    await pool.query(
-      "UPDATE notes SET is_favorite = ? WHERE id = ?",
-      [isFavorite, id]
-    );
-    
-    res.status(200).json({ 
-      id, 
+
+    await pool.query("UPDATE notes SET is_favorite = ? WHERE id = ?", [
       isFavorite,
-      message: isFavorite ? "笔记已收藏" : "笔记已取消收藏" 
+      id,
+    ]);
+
+    res.status(200).json({
+      id,
+      isFavorite,
+      message: isFavorite ? "笔记已收藏" : "笔记已取消收藏",
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -156,6 +156,48 @@ export const getFavoriteNotes = async (req, res) => {
     );
     res.status(200).json(rows);
   } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// 导出笔记为Markdown
+export const exportNoteAsMarkdown = async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    // 获取笔记数据
+    const [rows] = await pool.query(
+      "SELECT * FROM notes WHERE id = ?",
+      [id]
+    );
+    
+    if (rows.length === 0) {
+      return res.status(404).json({ message: "笔记不存在" });
+    }
+    
+    const note = rows[0];
+    
+    // 构建Markdown内容
+    let markdownContent = `# ${note.title}\n\n`;
+    
+    // 添加标签（如果有）
+    if (note.tags && note.tags.length > 0) {
+      markdownContent += '标签: ';
+      markdownContent += note.tags.map(tag => `\`${tag}\``).join(', ');
+      markdownContent += '\n\n';
+    }
+    
+    // 添加内容
+    markdownContent += note.content;
+    
+    // 设置响应头，指定文件类型和下载文件名
+    res.setHeader('Content-Type', 'text/markdown');
+    res.setHeader('Content-Disposition', `attachment; filename="${note.title.replace(/[^a-zA-Z0-9]/g, '_')}.md"`);
+    
+    // 发送Markdown内容
+    res.send(markdownContent);
+  } catch (error) {
+    console.error("导出笔记失败:", error);
     res.status(500).json({ error: error.message });
   }
 };

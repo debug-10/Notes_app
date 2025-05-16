@@ -18,14 +18,17 @@ const Navbar = () => {
   const { user, logout } = useStore();
   const { theme, toggleTheme } = useThemeStore();
   const location = useLocation();
-  
+
   const handleThemeChange = () => {
     toggleTheme();
     message.success(`已切换到${theme === 'light' ? '暗色' : '亮色'}主题`);
   };
 
   return (
-    <Header className="bg-white shadow-md px-4 flex items-center justify-between w-full z-50" style={{ backgroundColor: theme === 'dark' ? '#141414' : '#ffffff' }}>
+    <Header
+      className="bg-white shadow-md px-4 flex items-center justify-between w-full z-50"
+      style={{ backgroundColor: theme === 'dark' ? '#141414' : '#ffffff' }}
+    >
       <div className="flex items-center">
         <Link to="/" className="text-xl font-bold text-blue-600 mr-8">
           笔记应用
@@ -89,7 +92,7 @@ const Navbar = () => {
                   key: 'profile',
                   icon: <UserOutlined />,
                   label: '个人信息',
-                  onClick: () => window.location.href = '/profile',
+                  onClick: () => (window.location.href = '/profile'),
                 },
                 {
                   key: 'logout',

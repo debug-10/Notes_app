@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Descriptions, Tag, Button, message, Spin, Typography, Breadcrumb, Divider, Space } from 'antd';
-import { StarOutlined, StarFilled, EditOutlined, ArrowLeftOutlined, ClockCircleOutlined, TagsOutlined } from '@ant-design/icons';
-import { getNote, toggleNoteFavorite } from '@/api/noteApi';
+import { 
+  StarOutlined, 
+  StarFilled, 
+  EditOutlined, 
+  ArrowLeftOutlined, 
+  ClockCircleOutlined, 
+  TagsOutlined,
+  DownloadOutlined 
+} from '@ant-design/icons';
+import { getNote, toggleNoteFavorite, exportNoteAsMarkdown } from '@/api/noteApi';
 import { useStore } from '@/store/userStore';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -48,11 +56,24 @@ const Note = () => {
     }
   };
 
+  const handleExportNote = async () => {
+    try {
+      await exportNoteAsMarkdown(id);
+      message.success('笔记导出成功');
+    } catch (error) {
+      console.error('导出笔记失败:', error);
+      message.error('导出笔记失败，请重试');
+    }
+  };
+
   if (loading) {
     return (
       <>
         <Navbar />
-        <div className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto flex justify-center items-center" style={{ minHeight: '70vh' }}>
+        <div
+          className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto flex justify-center items-center"
+          style={{ minHeight: '70vh' }}
+        >
           <Spin size="large" tip="加载笔记中..." />
         </div>
       </>
@@ -112,6 +133,12 @@ const Note = () => {
                   {note.is_favorite ? '取消收藏' : '收藏'}
                 </Button>
                 <Button 
+                  icon={<DownloadOutlined />} 
+                  onClick={handleExportNote}
+                >
+                  导出
+                </Button>
+                <Button 
                   icon={<ArrowLeftOutlined />} 
                   onClick={() => navigate('/notes')}
                 >
@@ -125,19 +152,20 @@ const Note = () => {
             <ClockCircleOutlined className="mr-2 text-gray-500" />
             <Text type="secondary">
               创建时间: {new Date(note.created_at).toLocaleString()}
-              {note.updated_at && note.updated_at !== note.created_at && 
+              {note.updated_at &&
+                note.updated_at !== note.created_at &&
                 ` | 更新时间: ${new Date(note.updated_at).toLocaleString()}`}
             </Text>
           </div>
 
           <Divider />
-          
+
           <div className="note-content bg-gray-50 p-4 rounded-md mb-6">
             <Paragraph className="whitespace-pre-wrap text-lg">
               {note.content}
             </Paragraph>
           </div>
-          
+
           {note.tags && note.tags.length > 0 && (
             <div className="my-4">
               <div className="flex items-center mb-2">

@@ -13,6 +13,7 @@ import {
   Breadcrumb,
   Spin,
   Empty,
+  Dropdown,
 } from 'antd';
 import {
   UploadOutlined,
@@ -23,8 +24,10 @@ import {
   StarFilled,
   HomeOutlined,
   FileTextOutlined,
+  DownloadOutlined,
+  MoreOutlined,
 } from '@ant-design/icons';
-import { getNotes, deleteNote, toggleNoteFavorite } from '@/api/noteApi';
+import { getNotes, deleteNote, toggleNoteFavorite, exportNoteAsMarkdown } from '@/api/noteApi';
 import { useStore } from '@/store/userStore';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -77,17 +80,23 @@ const Notes = () => {
           }
 
           // 确保每个笔记对象都有必要的字段
-          const validNotes = notesData.filter(note => {
-            return note && typeof note === 'object' && note.title && note.content;
+          const validNotes = notesData.filter((note) => {
+            return (
+              note && typeof note === 'object' && note.title && note.content
+            );
           });
 
           if (validNotes.length === 0) {
-            message.error('导入的笔记数据无效，请确保每个笔记至少包含标题和内容');
+            message.error(
+              '导入的笔记数据无效，请确保每个笔记至少包含标题和内容',
+            );
             return;
           }
 
           if (validNotes.length < notesData.length) {
-            message.warning(`只有${validNotes.length}/${notesData.length}条笔记数据有效`);
+            message.warning(
+              `只有${validNotes.length}/${notesData.length}条笔记数据有效`,
+            );
           }
 
           // 调用API导入笔记
@@ -106,7 +115,9 @@ const Notes = () => {
             console.error('导入笔记API调用失败:', error);
             if (error.response) {
               // 服务器响应了请求，但返回了错误状态码
-              message.error(`服务器错误 (${error.response.status}): ${error.response.data?.message || '未知错误'}`);
+              message.error(
+                `服务器错误 (${error.response.status}): ${error.response.data?.message || '未知错误'}`,
+              );
             } else if (error.request) {
               // 请求已发送但没有收到响应
               message.error('服务器无响应，请检查网络连接');
@@ -132,11 +143,11 @@ const Notes = () => {
     try {
       await toggleNoteFavorite(noteId, !currentStatus);
       // 更新本地状态，避免重新获取所有笔记
-      setNotes(notes.map(note => 
-        note.id === noteId 
-          ? { ...note, is_favorite: !currentStatus } 
-          : note
-      ));
+      setNotes(
+        notes.map((note) =>
+          note.id === noteId ? { ...note, is_favorite: !currentStatus } : note,
+        ),
+      );
       message.success(currentStatus ? '已取消收藏' : '已添加到收藏');
     } catch (error) {
       console.error('更新收藏状态失败:', error);
@@ -153,6 +164,16 @@ const Notes = () => {
     } catch (error) {
       console.error('Failed to delete note:', error);
       message.error('删除笔记失败');
+    }
+  };
+
+  const handleExportNote = async (noteId) => {
+    try {
+      await exportNoteAsMarkdown(noteId);
+      message.success('笔记导出成功');
+    } catch (error) {
+      console.error('导出笔记失败:', error);
+      message.error('导出笔记失败，请重试');
     }
   };
 
@@ -229,14 +250,30 @@ const Notes = () => {
                       key="edit"
                       onClick={() => navigate(`/notes/edit/${item.id}`)}
                     />,
-                    <DeleteOutlined
-                      key="delete"
-                      className="text-red-500"
-                      onClick={() => {
-                        setModalVisible(true);
-                        setSelectedNoteId(item.id);
+                    <Dropdown
+                      key="more"
+                      menu={{
+                        items: [
+                          {
+                            key: 'export',
+                            icon: <DownloadOutlined />,
+                            label: '导出笔记',
+                            onClick: () => handleExportNote(item.id),
+                          },
+                          {
+                            key: 'delete',
+                            icon: <DeleteOutlined className="text-red-500" />,
+                            label: '删除笔记',
+                            onClick: () => {
+                              setModalVisible(true);
+                              setSelectedNoteId(item.id);
+                            },
+                          },
+                        ],
                       }}
-                    />,
+                    >
+                      <MoreOutlined />
+                    </Dropdown>,
                     item.is_favorite ? (
                       <StarFilled
                         key="favorite"

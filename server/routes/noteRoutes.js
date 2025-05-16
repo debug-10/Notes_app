@@ -9,6 +9,7 @@ import {
   importNotes,
   toggleFavorite,
   getFavoriteNotes,
+  exportNoteAsMarkdown,
 } from "../controllers/noteController.js";
 
 const router = express.Router();
@@ -39,5 +40,8 @@ router.put("/:id/favorite", toggleFavorite);
 
 // 获取收藏的笔记
 router.get("/favorites/:userId", getFavoriteNotes);
+
+// 导出笔记为Markdown
+router.get("/:id/export", exportNoteAsMarkdown);
 
 export default router;

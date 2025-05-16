@@ -17,7 +17,11 @@ import {
   DeleteOutlined,
   StarFilled,
 } from '@ant-design/icons';
-import { getFavoriteNotes, deleteNote, toggleNoteFavorite } from '@/api/noteApi';
+import {
+  getFavoriteNotes,
+  deleteNote,
+  toggleNoteFavorite,
+} from '@/api/noteApi';
 import { useStore } from '@/store/userStore';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -147,7 +151,10 @@ const Favorites = () => {
                 >
                   <Card.Meta
                     description={
-                      <Paragraph ellipsis={{ rows: 3 }} className="text-gray-600">
+                      <Paragraph
+                        ellipsis={{ rows: 3 }}
+                        className="text-gray-600"
+                      >
                         {item.content}
                       </Paragraph>
                     }

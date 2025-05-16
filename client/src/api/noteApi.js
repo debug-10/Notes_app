@@ -48,3 +48,15 @@ export const toggleNoteFavorite = async (noteId, isFavorite) => {
 export const getFavoriteNotes = async (userId) => {
   return axiosInstance.get(`/notes/favorites/${userId}`);
 };
+
+// 导出笔记为Markdown
+export const exportNoteAsMarkdown = async (noteId) => {
+  try {
+    // 使用window.open直接打开导出链接，触发浏览器下载
+    window.open(`${axiosInstance.defaults.baseURL}/notes/${noteId}/export`, '_blank');
+    return { success: true };
+  } catch (error) {
+    console.error('导出笔记失败:', error);
+    throw error;
+  }
+};
