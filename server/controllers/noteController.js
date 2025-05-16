@@ -93,34 +93,65 @@ export const deleteNote = async (req, res) => {
 export const importNotes = async (req, res) => {
   try {
     const { notes, userId } = req.body;
+    console.log('收到导入请求:', { userId, notesCount: notes?.length });
 
     if (!Array.isArray(notes)) {
       return res.status(400).json({ error: "导入的数据必须是笔记数组" });
     }
 
-    const promises = notes.map(async (note) => {
-      const { title, content, categoryId, tags } = note;
-      const [result] = await pool.query(
-        "INSERT INTO notes (user_id, title, content, category_id, tags) VALUES (?,?,?,?,?)",
-        [userId, title, content, categoryId, JSON.stringify(tags)]
-      );
-      return {
-        id: result.insertId,
-        userId,
-        title,
-        content,
-        categoryId,
-        tags,
-      };
-    });
+    if (!userId) {
+      return res.status(400).json({ error: "缺少用户ID" });
+    }
 
-    const importedNotes = await Promise.all(promises);
+    // 添加事务处理，确保所有笔记要么全部导入成功，要么全部失败
+    const connection = await pool.getConnection();
+    try {
+      await connection.beginTransaction();
 
-    res.status(200).json({
-      message: `成功导入 ${importedNotes.length} 条笔记`,
-      notes: importedNotes,
-    });
+      // 准备批量插入的数据
+      const insertPromises = notes.map(async (note) => {
+        // 确保每个笔记都有用户ID
+        const noteWithUserId = {
+          ...note,
+          user_id: userId
+        };
+        
+        // 插入笔记
+        const [result] = await connection.query(
+          "INSERT INTO notes (title, content, user_id, category_id, tags) VALUES (?, ?, ?, ?, ?)",
+          [
+            noteWithUserId.title,
+            noteWithUserId.content,
+            userId,
+            noteWithUserId.category_id || null,
+            JSON.stringify(noteWithUserId.tags || [])
+          ]
+        );
+        
+        return result.insertId;
+      });
+
+      // 等待所有插入操作完成
+      const insertedIds = await Promise.all(insertPromises);
+      
+      // 提交事务
+      await connection.commit();
+      
+      res.status(200).json({
+        message: "笔记导入成功",
+        count: insertedIds.length,
+        ids: insertedIds
+      });
+    } catch (error) {
+      // 发生错误时回滚事务
+      await connection.rollback();
+      console.error("导入笔记失败:", error);
+      res.status(500).json({ error: error.message });
+    } finally {
+      connection.release();
+    }
   } catch (error) {
+    console.error("导入笔记处理失败:", error);
     res.status(500).json({ error: error.message });
   }
 };

@@ -77,35 +77,33 @@ const Notes = () => {
         try {
           const content = e.target.result;
           const notesData = JSON.parse(content);
-
+  
           // 验证导入的数据格式
           if (!Array.isArray(notesData)) {
             message.error('导入的JSON必须是笔记数组格式');
             return;
           }
-
-          // 确保每个笔记对象都有必要的字段
-          const validNotes = notesData.filter((note) => {
-            return (
-              note && typeof note === 'object' && note.title && note.content
-            );
-          });
-
+  
+          // 确保每个笔记对象都有必要的字段，并添加用户ID
+          const validNotes = notesData.filter(note => {
+            return note && typeof note === 'object' && note.title && note.content;
+          }).map(note => ({
+            ...note,
+            user_id: user.id // 确保每个笔记都有用户ID
+          }));
+  
           if (validNotes.length === 0) {
-            message.error(
-              '导入的笔记数据无效，请确保每个笔记至少包含标题和内容',
-            );
+            message.error('导入的笔记数据无效，请确保每个笔记至少包含标题和内容');
             return;
           }
-
+  
           if (validNotes.length < notesData.length) {
-            message.warning(
-              `只有${validNotes.length}/${notesData.length}条笔记数据有效`,
-            );
+            message.warning(`只有${validNotes.length}/${notesData.length}条笔记数据有效`);
           }
-
+  
           // 调用API导入笔记
           try {
+            console.log('准备导入的笔记数据:', validNotes);
             const response = await importNotes(validNotes, user.id);
             if (response.status === 200) {
               message.success('笔记导入成功');
@@ -120,27 +118,26 @@ const Notes = () => {
             console.error('导入笔记API调用失败:', error);
             if (error.response) {
               // 服务器响应了请求，但返回了错误状态码
-              message.error(
-                `服务器错误 (${error.response.status}): ${error.response.data?.message || '未知错误'}`,
-              );
+              message.error(`服务器错误 (${error.response.status}): ${error.response.data?.message || '未知错误'}`);
             } else if (error.request) {
               // 请求已发送但没有收到响应
               message.error('服务器无响应，请检查网络连接');
             } else {
-              // 请求设置时出现问题
+              // 设置请求时发生的错误
               message.error(`请求错误: ${error.message}`);
             }
           }
         } catch (error) {
-          console.error('解析JSON失败:', error);
-          message.error('JSON格式错误，请检查导入文件');
+          console.error('解析导入文件失败:', error);
+          message.error('解析导入文件失败，请确保文件格式正确');
         }
       };
       reader.readAsText(file);
-      return false; // 阻止自动上传
+      return false; // 阻止默认上传行为
     } catch (error) {
-      console.error('导入笔记失败:', error);
-      message.error('导入笔记失败');
+      console.error('文件读取失败:', error);
+      message.error('文件读取失败');
+      return false;
     }
   };
 
