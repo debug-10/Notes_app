@@ -38,3 +38,13 @@ export const importNotes = async (notesData, userId) => {
   };
   return axiosInstance.post('/notes/import', data);
 };
+
+// 收藏/取消收藏笔记
+export const toggleNoteFavorite = async (noteId, isFavorite) => {
+  return axiosInstance.put(`/notes/${noteId}/favorite`, { isFavorite });
+};
+
+// 获取收藏的笔记
+export const getFavoriteNotes = async (userId) => {
+  return axiosInstance.get(`/notes/favorites/${userId}`);
+};

@@ -124,3 +124,38 @@ export const importNotes = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+
+// 收藏/取消收藏笔记
+export const toggleFavorite = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { isFavorite } = req.body;
+    
+    await pool.query(
+      "UPDATE notes SET is_favorite = ? WHERE id = ?",
+      [isFavorite, id]
+    );
+    
+    res.status(200).json({ 
+      id, 
+      isFavorite,
+      message: isFavorite ? "笔记已收藏" : "笔记已取消收藏" 
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// 获取收藏的笔记
+export const getFavoriteNotes = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const [rows] = await pool.query(
+      "SELECT * FROM notes WHERE user_id = ? AND is_favorite = true",
+      [userId]
+    );
+    res.status(200).json(rows);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

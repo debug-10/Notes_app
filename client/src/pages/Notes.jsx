@@ -16,8 +16,10 @@ import {
   EditOutlined,
   DeleteOutlined,
   EyeOutlined,
+  StarOutlined,
+  StarFilled,
 } from '@ant-design/icons';
-import { getNotes, deleteNote } from '@/api/noteApi';
+import { getNotes, deleteNote, toggleNoteFavorite } from '@/api/noteApi';
 import { useStore } from '@/store/userStore';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -117,6 +119,22 @@ const Notes = () => {
     }
   };
 
+  const handleToggleFavorite = async (noteId, currentStatus) => {
+    try {
+      await toggleNoteFavorite(noteId, !currentStatus);
+      // 更新本地状态，避免重新获取所有笔记
+      setNotes(notes.map(note => 
+        note.id === noteId 
+          ? { ...note, is_favorite: !currentStatus } 
+          : note
+      ));
+      message.success(currentStatus ? '已取消收藏' : '已添加到收藏');
+    } catch (error) {
+      console.error('更新收藏状态失败:', error);
+      message.error('操作失败，请重试');
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -181,6 +199,18 @@ const Notes = () => {
                       setSelectedNoteId(item.id);
                     }}
                   />,
+                  item.is_favorite ? (
+                    <StarFilled
+                      key="favorite"
+                      className="text-yellow-500"
+                      onClick={() => handleToggleFavorite(item.id, true)}
+                    />
+                  ) : (
+                    <StarOutlined
+                      key="favorite"
+                      onClick={() => handleToggleFavorite(item.id, false)}
+                    />
+                  ),
                 ]}
                 cover={
                   <div className="h-32 bg-gradient-to-r from-blue-100 to-blue-200 flex items-center justify-center p-4">

@@ -6,7 +6,9 @@ import {
   updateNote,
   deleteNote,
   getNotesByCategory,
-  importNotes, // 导入导入笔记函数
+  importNotes,
+  toggleFavorite,
+  getFavoriteNotes,
 } from "../controllers/noteController.js";
 
 const router = express.Router();
@@ -31,5 +33,11 @@ router.delete("/:id", deleteNote);
 
 // 导入笔记路由
 router.post("/import", importNotes);
+
+// 收藏/取消收藏笔记
+router.put("/:id/favorite", toggleFavorite);
+
+// 获取收藏的笔记
+router.get("/favorites/:userId", getFavoriteNotes);
 
 export default router;
