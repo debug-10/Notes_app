@@ -1,4 +1,4 @@
-import { Layout, Menu, Button, Avatar, Dropdown, Switch } from 'antd';
+import { Layout, Menu, Button, Avatar, Dropdown, Switch, message } from 'antd';
 import { Link, useLocation } from 'react-router-dom';
 import { useStore } from '@/store/userStore';
 import { useThemeStore } from '@/store/themeStore';
@@ -18,6 +18,11 @@ const Navbar = () => {
   const { user, logout } = useStore();
   const { theme, toggleTheme } = useThemeStore();
   const location = useLocation();
+  
+  const handleThemeChange = () => {
+    toggleTheme();
+    message.success(`已切换到${theme === 'light' ? '暗色' : '亮色'}主题`);
+  };
 
   return (
     <Header className="bg-white shadow-md px-4 flex items-center justify-between w-full z-50" style={{ backgroundColor: theme === 'dark' ? '#141414' : '#ffffff' }}>
@@ -71,7 +76,8 @@ const Navbar = () => {
             checkedChildren={<BulbFilled />}
             unCheckedChildren={<BulbOutlined />}
             checked={theme === 'dark'}
-            onChange={toggleTheme}
+            onChange={handleThemeChange}
+            className="theme-switch"
           />
         </div>
 
