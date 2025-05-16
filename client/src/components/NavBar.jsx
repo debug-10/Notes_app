@@ -104,7 +104,15 @@ const Navbar = () => {
             }}
           >
             <div className="flex items-center cursor-pointer hover:bg-gray-50 px-3 py-1 rounded-full transition-colors duration-300">
-              <Avatar icon={<UserOutlined />} className="bg-blue-500" />
+              <Avatar
+                icon={<UserOutlined />}
+                src={user.avatar || user.avatar_url || user.profile_image}
+                className="bg-blue-500"
+                onError={(e) => {
+                  console.log('头像加载失败');
+                  e.target.onerror = null;
+                }}
+              />
             </div>
           </Dropdown>
         ) : (

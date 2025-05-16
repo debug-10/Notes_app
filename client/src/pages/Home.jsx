@@ -1,5 +1,15 @@
 import { useState, useEffect, Suspense } from 'react';
-import { Layout, Typography, Card, Row, Col, Spin, Space, Button, Divider } from 'antd';
+import {
+  Layout,
+  Typography,
+  Card,
+  Row,
+  Col,
+  Spin,
+  Space,
+  Button,
+  Divider,
+} from 'antd';
 import {
   StarOutlined,
   FileTextOutlined,
@@ -195,15 +205,15 @@ const Home = () => {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          position: 'right',  // 将图例位置改为右侧
-          align: 'center',    // 图例对齐方式
+          position: 'right', // 将图例位置改为右侧
+          align: 'center', // 图例对齐方式
           labels: {
             font: {
               size: 12,
               family: 'Arial, sans-serif',
               color: '#333',
             },
-            padding: 15,      // 减小内边距
+            padding: 15, // 减小内边距
             usePointStyle: true,
             boxWidth: 8,
           },
@@ -241,15 +251,17 @@ const Home = () => {
     };
 
     return (
-      <div
-        className="bg-white rounded-xl shadow-md p-6 mb-8 h-[500px] transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 border-0"
-      >
+      <div className="bg-white rounded-xl shadow-md p-6 mb-8 h-[500px] transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 border-0">
         <div className="flex items-center mb-4">
           <PieChartOutlined className="text-blue-500 mr-2 text-xl" />
-          <Title level={4} className="m-0">分类统计</Title>
+          <Title level={4} className="m-0">
+            分类统计
+          </Title>
         </div>
         <Divider className="my-3" />
-        <div className="h-[420px] pb-4">  {/* 添加底部内边距 */}
+        <div className="h-[420px] pb-4">
+          {' '}
+          {/* 添加底部内边距 */}
           <Pie data={pieChartData} options={pieChartOptions} />
         </div>
       </div>
@@ -312,8 +324,8 @@ const Home = () => {
       },
       plugins: {
         legend: {
-          position: 'top',    // 将图例位置改为顶部
-          align: 'center',    // 图例对齐方式
+          position: 'top', // 将图例位置改为顶部
+          align: 'center', // 图例对齐方式
           labels: {
             font: {
               size: 12,
@@ -322,7 +334,7 @@ const Home = () => {
             },
             usePointStyle: true,
             boxWidth: 8,
-            padding: 15,      // 减小内边距
+            padding: 15, // 减小内边距
           },
         },
         tooltip: {
@@ -357,15 +369,17 @@ const Home = () => {
     };
 
     return (
-      <div
-        className="bg-white rounded-xl shadow-md p-6 mb-8 h-[500px] transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 border-0"
-      >
+      <div className="bg-white rounded-xl shadow-md p-6 mb-8 h-[500px] transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 border-0">
         <div className="flex items-center mb-4">
           <BarChartOutlined className="text-blue-500 mr-2 text-xl" />
-          <Title level={4} className="m-0">时间统计</Title>
+          <Title level={4} className="m-0">
+            时间统计
+          </Title>
         </div>
         <Divider className="my-3" />
-        <div className="h-[420px] pb-4">  {/* 添加底部内边距 */}
+        <div className="h-[420px] pb-4">
+          {' '}
+          {/* 添加底部内边距 */}
           <Bar data={barChartData} options={barChartOptions} />
         </div>
       </div>
@@ -421,7 +435,9 @@ const Home = () => {
                 <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-0">
                   <div className="flex items-center mb-4">
                     <TeamOutlined className="text-green-500 mr-2 text-xl" />
-                    <Title level={4} className="m-0">分类详情</Title>
+                    <Title level={4} className="m-0">
+                      分类详情
+                    </Title>
                   </div>
                   <Divider className="my-3" />
                   <CategoryStats
@@ -432,7 +448,9 @@ const Home = () => {
                 <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-0">
                   <div className="flex items-center mb-4">
                     <FileTextOutlined className="text-blue-500 mr-2 text-xl" />
-                    <Title level={4} className="m-0">快捷操作</Title>
+                    <Title level={4} className="m-0">
+                      快捷操作
+                    </Title>
                   </div>
                   <Divider className="my-3" />
                   <QuickActions />
@@ -440,7 +458,9 @@ const Home = () => {
                 <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-0">
                   <div className="flex items-center mb-4">
                     <StarOutlined className="text-yellow-500 mr-2 text-xl" />
-                    <Title level={4} className="m-0">最近笔记</Title>
+                    <Title level={4} className="m-0">
+                      最近笔记
+                    </Title>
                   </div>
                   <Divider className="my-3" />
                   <RecentNotes
@@ -462,7 +482,11 @@ const Home = () => {
                   请登录以使用全部功能
                 </Title>
                 <Space size="middle">
-                  <Button type="primary" size="large" className="rounded-lg px-8">
+                  <Button
+                    type="primary"
+                    size="large"
+                    className="rounded-lg px-8"
+                  >
                     <Link to="/login">立即登录</Link>
                   </Button>
                   <Button size="large" className="rounded-lg px-8">

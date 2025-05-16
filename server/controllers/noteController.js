@@ -93,7 +93,7 @@ export const deleteNote = async (req, res) => {
 export const importNotes = async (req, res) => {
   try {
     const { notes, userId } = req.body;
-    console.log('收到导入请求:', { userId, notesCount: notes?.length });
+    console.log("收到导入请求:", { userId, notesCount: notes?.length });
 
     if (!Array.isArray(notes)) {
       return res.status(400).json({ error: "导入的数据必须是笔记数组" });
@@ -113,9 +113,9 @@ export const importNotes = async (req, res) => {
         // 确保每个笔记都有用户ID
         const noteWithUserId = {
           ...note,
-          user_id: userId
+          user_id: userId,
         };
-        
+
         // 插入笔记
         const [result] = await connection.query(
           "INSERT INTO notes (title, content, user_id, category_id, tags) VALUES (?, ?, ?, ?, ?)",
@@ -124,23 +124,23 @@ export const importNotes = async (req, res) => {
             noteWithUserId.content,
             userId,
             noteWithUserId.category_id || null,
-            JSON.stringify(noteWithUserId.tags || [])
+            JSON.stringify(noteWithUserId.tags || []),
           ]
         );
-        
+
         return result.insertId;
       });
 
       // 等待所有插入操作完成
       const insertedIds = await Promise.all(insertPromises);
-      
+
       // 提交事务
       await connection.commit();
-      
+
       res.status(200).json({
         message: "笔记导入成功",
         count: insertedIds.length,
-        ids: insertedIds
+        ids: insertedIds,
       });
     } catch (error) {
       // 发生错误时回滚事务
