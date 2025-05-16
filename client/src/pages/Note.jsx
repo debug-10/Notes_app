@@ -1,15 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Descriptions, Tag, Button, message, Spin, Typography, Breadcrumb, Divider, Space } from 'antd';
-import { 
-  StarOutlined, 
-  StarFilled, 
-  EditOutlined, 
-  ArrowLeftOutlined, 
-  ClockCircleOutlined, 
+import {
+  Card,
+  Descriptions,
+  Tag,
+  Button,
+  message,
+  Spin,
+  Typography,
+  Breadcrumb,
+  Divider,
+  Space,
+} from 'antd';
+import {
+  StarOutlined,
+  StarFilled,
+  EditOutlined,
+  ArrowLeftOutlined,
+  ClockCircleOutlined,
   TagsOutlined,
-  DownloadOutlined 
+  DownloadOutlined,
 } from '@ant-design/icons';
-import { getNote, toggleNoteFavorite, exportNoteAsMarkdown } from '@/api/noteApi';
+import {
+  getNote,
+  toggleNoteFavorite,
+  exportNoteAsMarkdown,
+} from '@/api/noteApi';
 import { useStore } from '@/store/userStore';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';
@@ -110,36 +125,41 @@ const Note = () => {
           <Breadcrumb.Item>{note.title}</Breadcrumb.Item>
         </Breadcrumb>
 
-        <Card 
-          className="note-card shadow-md hover:shadow-lg transition-shadow duration-300" 
+        <Card
+          className="note-card shadow-md hover:shadow-lg transition-shadow duration-300"
           bordered={false}
           title={
             <div className="flex justify-between items-center">
-              <Title level={3} style={{ margin: 0 }}>{note.title}</Title>
+              <Title level={3} style={{ margin: 0 }}>
+                {note.title}
+              </Title>
               <Space>
-                <Button 
+                <Button
                   type="primary"
                   icon={<EditOutlined />}
                   onClick={() => navigate(`/notes/edit/${note.id}`)}
                 >
                   编辑
                 </Button>
-                <Button 
-                  type={note.is_favorite ? "default" : "primary"} 
-                  icon={note.is_favorite ? <StarFilled className="text-yellow-500" /> : <StarOutlined />}
+                <Button
+                  type={note.is_favorite ? 'default' : 'primary'}
+                  icon={
+                    note.is_favorite ? (
+                      <StarFilled className="text-yellow-500" />
+                    ) : (
+                      <StarOutlined />
+                    )
+                  }
                   onClick={handleToggleFavorite}
                   ghost={!note.is_favorite}
                 >
                   {note.is_favorite ? '取消收藏' : '收藏'}
                 </Button>
-                <Button 
-                  icon={<DownloadOutlined />} 
-                  onClick={handleExportNote}
-                >
+                <Button icon={<DownloadOutlined />} onClick={handleExportNote}>
                   导出
                 </Button>
-                <Button 
-                  icon={<ArrowLeftOutlined />} 
+                <Button
+                  icon={<ArrowLeftOutlined />}
                   onClick={() => navigate('/notes')}
                 >
                   返回

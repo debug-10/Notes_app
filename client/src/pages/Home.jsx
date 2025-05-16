@@ -1,9 +1,11 @@
 import { useState, useEffect, Suspense } from 'react';
-import { Layout, Typography, Card, Row, Col, Spin, Space, Button } from 'antd';
+import { Layout, Typography, Card, Row, Col, Spin, Space, Button, Divider } from 'antd';
 import {
   StarOutlined,
   FileTextOutlined,
   TeamOutlined,
+  BarChartOutlined,
+  PieChartOutlined,
 } from '@ant-design/icons';
 import Navbar from '@/components/Navbar';
 import { useStore } from '@/store/userStore';
@@ -128,7 +130,8 @@ const Home = () => {
           title="总笔记数"
           value={stats?.totalNotes || 0}
           prefix={<FileTextOutlined className="text-blue-500" />}
-          className="hover:shadow-lg transition-shadow duration-300"
+          className="hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-0"
+          style={{ borderRadius: '12px', overflow: 'hidden' }}
         />
       </Col>
       <Col xs={24} sm={24} md={8}>
@@ -136,7 +139,8 @@ const Home = () => {
           title="收藏笔记"
           value={stats?.favoriteNotes || 0}
           prefix={<StarOutlined className="text-yellow-500" />}
-          className="hover:shadow-lg transition-shadow duration-300"
+          className="hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-0"
+          style={{ borderRadius: '12px', overflow: 'hidden' }}
         />
       </Col>
       <Col xs={24} sm={24} md={8}>
@@ -144,7 +148,8 @@ const Home = () => {
           title="分类数量"
           value={stats?.categories || 0}
           prefix={<TeamOutlined className="text-green-500" />}
-          className="hover:shadow-lg transition-shadow duration-300"
+          className="hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-0"
+          style={{ borderRadius: '12px', overflow: 'hidden' }}
         />
       </Col>
     </Row>
@@ -165,12 +170,12 @@ const Home = () => {
           label: '笔记数量',
           data: data,
           backgroundColor: [
-            '#73A6FF', // 更柔和的蓝色
-            '#FF83A6', // 更柔和的粉色
-            '#5CD65C', // 更柔和的绿色
-            '#FFBC52', // 更柔和的黄色
-            '#A6A6A6', // 更柔和的灰色
-            '#B399FF', // 更柔和的紫色
+            'rgba(115, 166, 255, 0.8)', // 更柔和的蓝色
+            'rgba(255, 131, 166, 0.8)', // 更柔和的粉色
+            'rgba(92, 214, 92, 0.8)', // 更柔和的绿色
+            'rgba(255, 188, 82, 0.8)', // 更柔和的黄色
+            'rgba(166, 166, 166, 0.8)', // 更柔和的灰色
+            'rgba(179, 153, 255, 0.8)', // 更柔和的紫色
           ],
           borderColor: [
             '#73A6FF',
@@ -180,7 +185,7 @@ const Home = () => {
             '#A6A6A6',
             '#B399FF',
           ],
-          borderWidth: 1,
+          borderWidth: 2,
         },
       ],
     };
@@ -190,13 +195,17 @@ const Home = () => {
       maintainAspectRatio: false,
       plugins: {
         legend: {
-          position: 'bottom',
+          position: 'right',  // 将图例位置改为右侧
+          align: 'center',    // 图例对齐方式
           labels: {
             font: {
               size: 12,
               family: 'Arial, sans-serif',
               color: '#333',
             },
+            padding: 15,      // 减小内边距
+            usePointStyle: true,
+            boxWidth: 8,
           },
         },
         tooltip: {
@@ -205,19 +214,44 @@ const Home = () => {
             family: 'Arial, sans-serif',
             color: '#333',
           },
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          titleColor: '#333',
+          bodyColor: '#333',
+          borderColor: '#ddd',
+          borderWidth: 1,
+          padding: 12,
+          cornerRadius: 8,
+          displayColors: true,
+        },
+        title: {
+          display: true,
+          text: '笔记分类统计',
+          font: {
+            size: 16,
+            family: 'Arial, sans-serif',
+            weight: 'bold',
+          },
+          padding: {
+            top: 10,
+            bottom: 20,
+          },
+          color: '#333',
         },
       },
     };
 
     return (
       <div
-        className="bg-white rounded-lg shadow-md p-6 mb-8 h-[400px] transition-shadow duration-300 hover:shadow-xl"
-        style={{
-          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-          borderRadius: '8px',
-        }}
+        className="bg-white rounded-xl shadow-md p-6 mb-8 h-[500px] transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 border-0"
       >
-        <Pie data={pieChartData} options={pieChartOptions} />
+        <div className="flex items-center mb-4">
+          <PieChartOutlined className="text-blue-500 mr-2 text-xl" />
+          <Title level={4} className="m-0">分类统计</Title>
+        </div>
+        <Divider className="my-3" />
+        <div className="h-[420px] pb-4">  {/* 添加底部内边距 */}
+          <Pie data={pieChartData} options={pieChartOptions} />
+        </div>
       </div>
     );
   };
@@ -233,9 +267,11 @@ const Home = () => {
         {
           label: '笔记数量',
           data: data,
-          backgroundColor: '#73A6FF', // 更柔和的蓝色
+          backgroundColor: 'rgba(115, 166, 255, 0.7)', // 更柔和的蓝色
           borderColor: '#73A6FF',
-          borderWidth: 1,
+          borderWidth: 2,
+          borderRadius: 6,
+          hoverBackgroundColor: 'rgba(115, 166, 255, 0.9)',
         },
       ],
     };
@@ -254,12 +290,15 @@ const Home = () => {
               family: 'Arial, sans-serif',
               color: '#333',
             },
+            maxRotation: 45,
+            minRotation: 45,
           },
         },
         y: {
           beginAtZero: true,
           grid: {
-            color: 'rgba(0, 0, 0, 0.1)',
+            color: 'rgba(0, 0, 0, 0.05)',
+            drawBorder: false,
           },
           ticks: {
             font: {
@@ -267,18 +306,23 @@ const Home = () => {
               family: 'Arial, sans-serif',
               color: '#333',
             },
+            stepSize: 1,
           },
         },
       },
       plugins: {
         legend: {
-          position: 'bottom',
+          position: 'top',    // 将图例位置改为顶部
+          align: 'center',    // 图例对齐方式
           labels: {
             font: {
               size: 12,
               family: 'Arial, sans-serif',
               color: '#333',
             },
+            usePointStyle: true,
+            boxWidth: 8,
+            padding: 15,      // 减小内边距
           },
         },
         tooltip: {
@@ -287,19 +331,43 @@ const Home = () => {
             family: 'Arial, sans-serif',
             color: '#333',
           },
+          backgroundColor: 'rgba(255, 255, 255, 0.9)',
+          titleColor: '#333',
+          bodyColor: '#333',
+          borderColor: '#ddd',
+          borderWidth: 1,
+          padding: 12,
+          cornerRadius: 8,
+        },
+        title: {
+          display: true,
+          text: '笔记创建时间统计',
+          font: {
+            size: 16,
+            family: 'Arial, sans-serif',
+            weight: 'bold',
+          },
+          padding: {
+            top: 10,
+            bottom: 20,
+          },
+          color: '#333',
         },
       },
     };
 
     return (
       <div
-        className="bg-white rounded-lg shadow-md p-6 mb-8 h-[400px] transition-shadow duration-300 hover:shadow-xl"
-        style={{
-          boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-          borderRadius: '8px',
-        }}
+        className="bg-white rounded-xl shadow-md p-6 mb-8 h-[500px] transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 border-0"
       >
-        <Bar data={barChartData} options={barChartOptions} />
+        <div className="flex items-center mb-4">
+          <BarChartOutlined className="text-blue-500 mr-2 text-xl" />
+          <Title level={4} className="m-0">时间统计</Title>
+        </div>
+        <Divider className="my-3" />
+        <div className="h-[420px] pb-4">  {/* 添加底部内边距 */}
+          <Bar data={barChartData} options={barChartOptions} />
+        </div>
       </div>
     );
   };
@@ -309,12 +377,14 @@ const Home = () => {
       <Navbar />
       <Content className="p-4 md:p-6 lg:p-8 max-w-7xl mx-auto w-full mt-16">
         {user ? (
-          <Title
-            level={2}
-            className="mb-8 text-center md:text-left animate-fade-in"
-          >
-            欢迎回来, {user.nickname || user.username}!
-          </Title>
+          <div className="mb-8 animate-fade-in">
+            <Title level={2} className="text-center md:text-left mb-2">
+              欢迎回来, {user.nickname || user.username}!
+            </Title>
+            <p className="text-gray-500 text-center md:text-left">
+              这里是您的笔记概览，一目了然地查看您的笔记统计和最近活动。
+            </p>
+          </div>
         ) : (
           <Title
             level={2}
@@ -324,11 +394,11 @@ const Home = () => {
           </Title>
         )}
 
-        <Row gutter={24}>
-          <Col xs={24} sm={24} md={12}>
+        <Row gutter={[24, 24]}>
+          <Col xs={24} lg={12}>
             {renderCategoryPieChart()}
           </Col>
-          <Col xs={24} sm={24} md={12}>
+          <Col xs={24} lg={12}>
             {renderCreationTimeBarChart()}
           </Col>
         </Row>
@@ -348,16 +418,31 @@ const Home = () => {
                 }
               >
                 {renderStats()}
-                <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+                <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-0">
+                  <div className="flex items-center mb-4">
+                    <TeamOutlined className="text-green-500 mr-2 text-xl" />
+                    <Title level={4} className="m-0">分类详情</Title>
+                  </div>
+                  <Divider className="my-3" />
                   <CategoryStats
                     categoryNoteCounts={stats?.categoryNoteCounts}
                     categoriesData={categoriesData}
                   />
                 </div>
-                <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+                <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-0">
+                  <div className="flex items-center mb-4">
+                    <FileTextOutlined className="text-blue-500 mr-2 text-xl" />
+                    <Title level={4} className="m-0">快捷操作</Title>
+                  </div>
+                  <Divider className="my-3" />
                   <QuickActions />
                 </div>
-                <div className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow duration-300">
+                <div className="bg-white rounded-xl shadow-md p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border-0">
+                  <div className="flex items-center mb-4">
+                    <StarOutlined className="text-yellow-500 mr-2 text-xl" />
+                    <Title level={4} className="m-0">最近笔记</Title>
+                  </div>
+                  <Divider className="my-3" />
                   <RecentNotes
                     notes={stats?.recentNotes || []}
                     searchQuery={searchQuery}
@@ -372,15 +457,15 @@ const Home = () => {
             )}
 
             {!user && (
-              <Card className="text-center shadow-sm hover:shadow-md transition-shadow duration-300">
+              <Card className="text-center shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 rounded-xl border-0 p-8">
                 <Title level={4} className="mb-6">
                   请登录以使用全部功能
                 </Title>
                 <Space size="middle">
-                  <Button type="primary" size="large">
+                  <Button type="primary" size="large" className="rounded-lg px-8">
                     <Link to="/login">立即登录</Link>
                   </Button>
-                  <Button size="large">
+                  <Button size="large" className="rounded-lg px-8">
                     <Link to="/register">注册账号</Link>
                   </Button>
                 </Space>

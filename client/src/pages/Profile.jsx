@@ -72,7 +72,7 @@ const Profile = () => {
                 <Avatar
                   size={100}
                   icon={<UserOutlined />}
-                  src={user.avatar_url}
+                  src={user.avatar_url || null}
                   className="mb-4 bg-blue-500"
                 />
                 <Title level={3}>{user.nickname || user.username}</Title>

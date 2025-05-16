@@ -27,7 +27,12 @@ import {
   DownloadOutlined,
   MoreOutlined,
 } from '@ant-design/icons';
-import { getNotes, deleteNote, toggleNoteFavorite, exportNoteAsMarkdown } from '@/api/noteApi';
+import {
+  getNotes,
+  deleteNote,
+  toggleNoteFavorite,
+  exportNoteAsMarkdown,
+} from '@/api/noteApi';
 import { useStore } from '@/store/userStore';
 import { useNavigate, Link } from 'react-router-dom';
 import Navbar from '@/components/Navbar';

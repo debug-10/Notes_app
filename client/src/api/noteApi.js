@@ -53,7 +53,10 @@ export const getFavoriteNotes = async (userId) => {
 export const exportNoteAsMarkdown = async (noteId) => {
   try {
     // 使用window.open直接打开导出链接，触发浏览器下载
-    window.open(`${axiosInstance.defaults.baseURL}/notes/${noteId}/export`, '_blank');
+    window.open(
+      `${axiosInstance.defaults.baseURL}/notes/${noteId}/export`,
+      '_blank',
+    );
     return { success: true };
   } catch (error) {
     console.error('导出笔记失败:', error);

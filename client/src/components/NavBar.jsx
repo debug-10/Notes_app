@@ -105,9 +105,6 @@ const Navbar = () => {
           >
             <div className="flex items-center cursor-pointer hover:bg-gray-50 px-3 py-1 rounded-full transition-colors duration-300">
               <Avatar icon={<UserOutlined />} className="bg-blue-500" />
-              <span className="ml-2 text-gray-700">
-                {user.nickname || user.username}
-              </span>
             </div>
           </Dropdown>
         ) : (
